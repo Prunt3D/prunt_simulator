@@ -2,8 +2,27 @@ with Prunt_Glue;     use Prunt_Glue;
 with Prunt_Glue.Glue;
 with Physical_Types; use Physical_Types;
 with System.Multiprocessors;
+with Basic_Thermal_Model;
 
 procedure Prunt_Simulator is
+
+   type Heater_Name is (Hotend, Bed);
+
+   Heater_Models : array (Heater_Name) of Basic_Thermal_Model.Block_Type :=
+     [Hotend =>
+       (Heater_PWM            => 0.0,
+        Heater_Max_Power      => 50.0 * watt,
+        Block_Heat_Capacity   => 30.0 * gram * 0.9 * joule / (gram * celcius),
+        Block_Temperature     => 20.0 * celcius,
+        Block_To_Air_Transfer => 0.2 * watt / celcius,
+        Air_Temperature       => 20.0 * celcius),
+     Bed     =>
+       (Heater_PWM            => 0.0,
+        Heater_Max_Power      => 50.0 * watt,
+        Block_Heat_Capacity   => 300.0 * gram * 0.9 * joule / (gram * celcius),
+        Block_Temperature     => 20.0 * celcius,
+        Block_To_Air_Transfer => 0.5 * watt / celcius,
+        Air_Temperature       => 20.0 * celcius)];
 
    type Low_Level_Time_Type is mod 2**64;
 
@@ -23,29 +42,29 @@ procedure Prunt_Simulator is
 
    function Get_Time return Low_Level_Time_Type is
    begin
+      for I in Heater_Name loop
+         Basic_Thermal_Model.Update (Heater_Models (I), Low_Level_To_Time (1));
+      end loop;
+
       Last_Time := @ + 1;
       return Last_Time;
    end Get_Time;
 
-   type Stepper_Name is (J10, J11, J12, J20, J21, J22);
+   type Stepper_Name is (X, Y, Z, E);
 
    procedure Set_Stepper_Pin_State (Stepper : Stepper_Name; Pin : Stepper_Output_Pins; State : Pin_State) is
    begin
       null;
    end Set_Stepper_Pin_State;
 
-   type Heater_Name is (A, B, C);
-
    procedure Set_Heater_PWM (Heater : Heater_Name; PWM : PWM_Scale) is
    begin
-      null;
+      Heater_Models (Heater).Heater_PWM := PWM;
    end Set_Heater_PWM;
 
-   type Thermistor_Name is (X, Y, Z);
-
-   function Get_Thermistor_Voltage (Thermistor : Thermistor_Name) return Voltage is
+   function Get_Thermistor_Voltage (Thermistor : Heater_Name) return Voltage is
    begin
-      return 1.0 * volt;
+      return Heater_Models (Thermistor).Block_Temperature * 1.0 * volt / celcius;
    end Get_Thermistor_Voltage;
 
    type Fan_Name is (Fan_1, Fan_2);
@@ -93,7 +112,7 @@ procedure Prunt_Simulator is
       Get_Stepper_Pin_State       => Get_Stepper_Pin_State,
       Heater_Name                 => Heater_Name,
       Set_Heater_PWM              => Set_Heater_PWM,
-      Thermistor_Name             => Thermistor_Name,
+      Thermistor_Name             => Heater_Name,
       Get_Thermistor_Voltage      => Get_Thermistor_Voltage,
       Fan_Name                    => Fan_Name,
       Set_Fan_PWM                 => Set_Fan_PWM,
