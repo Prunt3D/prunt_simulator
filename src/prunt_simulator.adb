@@ -3,6 +3,7 @@ with Prunt_Glue.Glue;
 with Physical_Types; use Physical_Types;
 with System.Multiprocessors;
 with Basic_Thermal_Model;
+with Basic_Stepper_Model;
 
 procedure Prunt_Simulator is
 
@@ -23,6 +24,14 @@ procedure Prunt_Simulator is
         Block_Temperature     => 20.0 * celcius,
         Block_To_Air_Transfer => 0.5 * watt / celcius,
         Air_Temperature       => 20.0 * celcius)];
+
+   subtype Stepper_Name is Axis_Name;
+
+   Stepper_Models : array (Stepper_Name) of Basic_Stepper_Model.Stepper_Type :=
+     [E_Axis => (Pos => 0.0 * mm, Mm_Per_Step => 0.005 * mm, others => <>),
+     X_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.03 * mm, others => <>),
+     Y_Axis  => (Pos => 0.1 * mm, Mm_Per_Step => 0.02 * mm, others => <>),
+     Z_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.01 * mm, others => <>)];
 
    type Low_Level_Time_Type is mod 2**64;
 
@@ -50,11 +59,19 @@ procedure Prunt_Simulator is
       return Last_Time;
    end Get_Time;
 
-   type Stepper_Name is (X, Y, Z, E);
-
    procedure Set_Stepper_Pin_State (Stepper : Stepper_Name; Pin : Stepper_Output_Pins; State : Pin_State) is
    begin
-      null;
+      case Pin is
+         when Step_Pin =>
+            if Stepper_Models (Stepper).Step /= State then
+               Basic_Stepper_Model.Take_Step (Stepper_Models (Stepper));
+            end if;
+            Stepper_Models (Stepper).Step := State;
+         when Dir_Pin =>
+            Stepper_Models (Stepper).Dir := State;
+         when Enable_Pin =>
+            null;
+      end case;
    end Set_Stepper_Pin_State;
 
    procedure Set_Heater_PWM (Heater : Heater_Name; PWM : PWM_Scale) is
@@ -84,11 +101,9 @@ procedure Prunt_Simulator is
       return 123.0 * hertz;
    end Get_Fan_Frequency;
 
-   type Input_Switch_Name is (J5, J6, J7, J8);
-
-   function Get_Input_Switch_State (Switch : Input_Switch_Name) return Pin_State is
+   function Get_Input_Switch_State (Switch : Stepper_Name) return Pin_State is
    begin
-      return Low_State;
+      return (if Stepper_Models (Switch).Pos <= 1.0 * mm then High_State else Low_State);
    end Get_Input_Switch_State;
 
    procedure Toggle_Stepper_Pin_State (Stepper : Stepper_Name; Pin : Stepper_Output_Pins) is
@@ -118,7 +133,7 @@ procedure Prunt_Simulator is
       Set_Fan_PWM                 => Set_Fan_PWM,
       Set_Fan_Voltage             => Set_Fan_Voltage,
       Get_Fan_Frequency           => Get_Fan_Frequency,
-      Input_Switch_Name           => Input_Switch_Name,
+      Input_Switch_Name           => Stepper_Name,
       Get_Input_Switch_State      => Get_Input_Switch_State,
       Planner_CPU                 => System.Multiprocessors.Not_A_Specific_CPU,
       Stepgen_Preprocessor_CPU    => 3,
