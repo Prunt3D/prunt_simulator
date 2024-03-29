@@ -135,7 +135,6 @@ procedure Prunt_Simulator is
       Get_Fan_Frequency           => Get_Fan_Frequency,
       Input_Switch_Name           => Stepper_Name,
       Get_Input_Switch_State      => Get_Input_Switch_State,
-      Planner_CPU                 => System.Multiprocessors.Not_A_Specific_CPU,
       Stepgen_Preprocessor_CPU    => 3,
       Stepgen_Pulse_Generator_CPU => 4,
       Config_Path                 => "./prunt_sim.toml",
