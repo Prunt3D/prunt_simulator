@@ -1,0 +1,148 @@
+[Bed_Mesh]
+Kind = "NO_MESH_KIND"
+[Extruder]
+Filament_Diameter = 1.75000000000000E+00
+Nozzle_Diameter = 4.00000000000000E-01
+Starting_Pressure_Advance_Time = 0.00000000000000E+00
+[Fan]
+[Fan.FAN_1]
+Kind = "DISABLED_KIND"
+[Fan.FAN_2]
+Kind = "DISABLED_KIND"
+[G_Code_Assignment]
+Bed_Heater = "HOTEND"
+Hotend_Heater = "HOTEND"
+[Heater]
+[Heater.BED]
+Kind = "DISABLED_KIND"
+Thermistor = "HOTEND"
+[Heater.HOTEND]
+Kind = "DISABLED_KIND"
+Thermistor = "HOTEND"
+[Homing]
+[Homing.E_AXIS]
+First_Move_Distance = 0.00000000000000E+00
+Kind = "SET_TO_VALUE_KIND"
+Second_Move_Distance = 0.00000000000000E+00
+Switch = "X_AXIS"
+Switch_Position = 0.00000000000000E+00
+Value = 0.00000000000000E+00
+[Homing.X_AXIS]
+First_Move_Distance = -1.00000000000000E+00
+Kind = "DOUBLE_TAP_KIND"
+Second_Move_Distance = -3.00000000000000E-01
+Switch = "X_AXIS"
+Switch_Position = 0.00000000000000E+00
+[Homing.Y_AXIS]
+First_Move_Distance = -1.00000000000000E+00
+Kind = "DOUBLE_TAP_KIND"
+Second_Move_Distance = -3.00000000000000E-01
+Switch = "Y_AXIS"
+Switch_Position = 0.00000000000000E+00
+[Homing.Z_AXIS]
+First_Move_Distance = 1.00000000000000E+00
+Kind = "DOUBLE_TAP_KIND"
+Second_Move_Distance = 3.00000000000000E-01
+Switch = "Z_AXIS"
+Switch_Position = 1.00000000000000E+02
+[Input_Switch]
+[Input_Switch.E_AXIS]
+Enabled = false
+Hit_On_High = false
+[Input_Switch.X_AXIS]
+Enabled = true
+Hit_On_High = true
+[Input_Switch.Y_AXIS]
+Enabled = true
+Hit_On_High = true
+[Input_Switch.Z_AXIS]
+Enabled = true
+Hit_On_High = true
+[Kinematics]
+E_Steppers = [
+"E_AXIS",
+]
+Ignore_E_Feedrate_In_XYZE_Moves = true
+Kind = "CARTESIAN_KIND"
+Max_Feedrate = 1.00000000000000E+02
+Minimum_Cruise_Ratio = 3.00000000000000E-02
+X_Steppers = [
+"X_AXIS",
+]
+Y_Steppers = [
+"Y_AXIS",
+]
+Z_Steppers = [
+"Z_AXIS",
+]
+[Kinematics.Lower_Pos_Limit]
+E_AXIS = -8.98846567431158E+307
+X_AXIS = 0.00000000000000E+00
+Y_AXIS = 0.00000000000000E+00
+Z_AXIS = 0.00000000000000E+00
+[Kinematics.Max_Axial_Velocities]
+E_AXIS = 1.00000000000000E+02
+X_AXIS = 1.00000000000000E+02
+Y_AXIS = 1.00000000000000E+02
+Z_AXIS = 1.00000000000000E+02
+[Kinematics.Max_Limits]
+Acceleration_Max = 1.00000000000000E+03
+Chord_Error_Max = 1.00000000000000E-01
+Crackle_Max = 1.00000000000000E+09
+Jerk_Max = 1.00000000000000E+05
+Snap_Max = 1.00000000000000E+07
+[Kinematics.Planning_Scaler]
+E_AXIS = 1.00000000000000E+00
+X_AXIS = 1.00000000000000E+00
+Y_AXIS = 1.00000000000000E+00
+Z_AXIS = 1.00000000000000E+00
+[Kinematics.Upper_Pos_Limit]
+E_AXIS = 8.98846567431158E+307
+X_AXIS = 1.00000000000000E+02
+Y_AXIS = 1.00000000000000E+02
+Z_AXIS = 1.00000000000000E+02
+[Prunt]
+Enabled = true
+[Stepper]
+[Stepper.E_AXIS]
+Direction_Setup_Time = 0.00000000000000E+00
+Enabled = true
+Enabled_On_High = false
+Fault_On_High = false
+Invert_Direction = false
+Mm_Per_Step = 1.00000000000000E-03
+Step_Time = 0.00000000000000E+00
+[Stepper.X_AXIS]
+Direction_Setup_Time = 0.00000000000000E+00
+Enabled = true
+Enabled_On_High = false
+Fault_On_High = false
+Invert_Direction = false
+Mm_Per_Step = 1.00000000000000E-03
+Step_Time = 0.00000000000000E+00
+[Stepper.Y_AXIS]
+Direction_Setup_Time = 0.00000000000000E+00
+Enabled = true
+Enabled_On_High = false
+Fault_On_High = false
+Invert_Direction = false
+Mm_Per_Step = 1.00000000000000E-03
+Step_Time = 0.00000000000000E+00
+[Stepper.Z_AXIS]
+Direction_Setup_Time = 0.00000000000000E+00
+Enabled = true
+Enabled_On_High = false
+Fault_On_High = false
+Invert_Direction = false
+Mm_Per_Step = 1.00000000000000E-03
+Step_Time = 0.00000000000000E+00
+[Thermistor]
+[Thermistor.BED]
+Enabled = false
+Maximum_Temperature = 0.00000000000000E+00
+Minimum_Temperature = 0.00000000000000E+00
+[Thermistor.HOTEND]
+Enabled = false
+Maximum_Temperature = 0.00000000000000E+00
+Minimum_Temperature = 0.00000000000000E+00
+
