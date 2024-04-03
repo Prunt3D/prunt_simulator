@@ -29,10 +29,10 @@ procedure Prunt_Simulator is
    subtype Stepper_Name is Axis_Name;
 
    Stepper_Models : array (Stepper_Name) of Basic_Stepper_Model.Stepper_Type :=
-     [E_Axis => (Pos => 0.0 * mm, Mm_Per_Step => 0.005 * mm, others => <>),
-     X_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.03 * mm, others => <>),
-     Y_Axis  => (Pos => 0.1 * mm, Mm_Per_Step => 0.02 * mm, others => <>),
-     Z_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.01 * mm, others => <>)];
+     [E_Axis => (Pos => 0.0 * mm, Mm_Per_Step => 0.001 * mm, others => <>),
+     X_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.001 * mm, others => <>),
+     Y_Axis  => (Pos => 0.1 * mm, Mm_Per_Step => 0.001 * mm, others => <>),
+     Z_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.001 * mm, others => <>)];
 
    type Low_Level_Time_Type is mod 2**64;
 
@@ -112,7 +112,11 @@ procedure Prunt_Simulator is
 
    function Get_Input_Switch_State (Switch : Stepper_Name) return Pin_State is
    begin
-      return (if Stepper_Models (Switch).Pos <= 1.0 * mm then High_State else Low_State);
+      if Switch = Z_Axis then
+         return (if Stepper_Models (Switch).Pos >= 100.0 * mm then High_State else Low_State);
+      else
+         return (if Stepper_Models (Switch).Pos <= 0.0 * mm then High_State else Low_State);
+      end if;
    end Get_Input_Switch_State;
 
    procedure Toggle_Stepper_Pin_State (Stepper : Stepper_Name; Pin : Stepper_Output_Pins) is
@@ -147,7 +151,7 @@ procedure Prunt_Simulator is
       Stepgen_Preprocessor_CPU    => 3,
       Stepgen_Pulse_Generator_CPU => 4,
       Config_Path                 => "./prunt_sim.toml",
-      Interpolation_Time          => Time_To_Low_Level (0.005 * s));
+      Interpolation_Time          => Time_To_Low_Level (0.0005 * s));
 
 begin
    My_Glue.Run;
