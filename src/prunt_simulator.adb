@@ -4,6 +4,7 @@ with Physical_Types; use Physical_Types;
 with System.Multiprocessors;
 with Basic_Thermal_Model;
 with Basic_Stepper_Model;
+with Ada.Text_IO;    use Ada.Text_IO;
 
 procedure Prunt_Simulator is
 
@@ -47,10 +48,18 @@ procedure Prunt_Simulator is
       return Dimensioned_Float (T) / Dimensioned_Float (Ticks_Per_Second) * s;
    end Low_Level_To_Time;
 
-   Last_Time : Low_Level_Time_Type := 0;
+   Last_Time : Low_Level_Time_Type := 0 with
+     Volatile;
 
    function Get_Time return Low_Level_Time_Type is
    begin
+      if Last_Time mod 27_000 = 0 then
+         Put_Line
+           (Low_Level_To_Time (Last_Time)'Image & "," & Stepper_Models (X_Axis).Pos'Image & "," &
+            Stepper_Models (Y_Axis).Pos'Image & "," & Stepper_Models (Z_Axis).Pos'Image & "," &
+            Stepper_Models (E_Axis).Pos'Image);
+      end if;
+
       for I in Heater_Name loop
          Basic_Thermal_Model.Update (Heater_Models (I), Low_Level_To_Time (1));
       end loop;
