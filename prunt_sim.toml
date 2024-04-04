@@ -110,7 +110,7 @@ Enabled = true
 Enabled_On_High = false
 Fault_On_High = false
 Invert_Direction = false
-Mm_Per_Step = 1.00000000000000E-03
+Mm_Per_Step = 1.00000000000000E-06
 Step_Time = 0.00000000000000E+00
 [Stepper.X_AXIS]
 Direction_Setup_Time = 0.00000000000000E+00
@@ -118,7 +118,7 @@ Enabled = true
 Enabled_On_High = false
 Fault_On_High = false
 Invert_Direction = false
-Mm_Per_Step = 1.00000000000000E-03
+Mm_Per_Step = 1.00000000000000E-06
 Step_Time = 0.00000000000000E+00
 [Stepper.Y_AXIS]
 Direction_Setup_Time = 0.00000000000000E+00
@@ -126,7 +126,7 @@ Enabled = true
 Enabled_On_High = false
 Fault_On_High = false
 Invert_Direction = false
-Mm_Per_Step = 1.00000000000000E-03
+Mm_Per_Step = 1.00000000000000E-06
 Step_Time = 0.00000000000000E+00
 [Stepper.Z_AXIS]
 Direction_Setup_Time = 0.00000000000000E+00
@@ -134,7 +134,7 @@ Enabled = true
 Enabled_On_High = false
 Fault_On_High = false
 Invert_Direction = false
-Mm_Per_Step = 1.00000000000000E-03
+Mm_Per_Step = 1.00000000000000E-06
 Step_Time = 0.00000000000000E+00
 [Thermistor]
 [Thermistor.BED]

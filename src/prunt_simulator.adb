@@ -29,14 +29,14 @@ procedure Prunt_Simulator is
    subtype Stepper_Name is Axis_Name;
 
    Stepper_Models : array (Stepper_Name) of Basic_Stepper_Model.Stepper_Type :=
-     [E_Axis => (Pos => 0.0 * mm, Mm_Per_Step => 0.001 * mm, others => <>),
-     X_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.001 * mm, others => <>),
-     Y_Axis  => (Pos => 0.1 * mm, Mm_Per_Step => 0.001 * mm, others => <>),
-     Z_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.001 * mm, others => <>)];
+     [E_Axis => (Pos => 0.0 * mm, Mm_Per_Step => 0.000001 * mm, others => <>),
+     X_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.000001 * mm, others => <>),
+     Y_Axis  => (Pos => 0.1 * mm, Mm_Per_Step => 0.000001 * mm, others => <>),
+     Z_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.000001 * mm, others => <>)];
 
    type Low_Level_Time_Type is mod 2**64;
 
-   Ticks_Per_Second : constant Low_Level_Time_Type := 54_000_000;
+   Ticks_Per_Second : constant Low_Level_Time_Type := 540_000_000;
 
    function Time_To_Low_Level (T : Time) return Low_Level_Time_Type is
    begin
@@ -53,7 +53,7 @@ procedure Prunt_Simulator is
 
    function Get_Time return Low_Level_Time_Type is
    begin
-      if Last_Time mod 27_000 = 0 then
+      if Last_Time mod 270_000 = 0 then
          Put_Line
            (Low_Level_To_Time (Last_Time)'Image & "," & Stepper_Models (X_Axis).Pos'Image & "," &
             Stepper_Models (Y_Axis).Pos'Image & "," & Stepper_Models (Z_Axis).Pos'Image & "," &
