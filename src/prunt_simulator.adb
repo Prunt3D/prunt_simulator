@@ -119,11 +119,6 @@ procedure Prunt_Simulator is
       end if;
    end Get_Input_Switch_State;
 
-   procedure Toggle_Stepper_Pin_State (Stepper : Stepper_Name; Pin : Stepper_Output_Pins) is
-   begin
-      null;
-   end Toggle_Stepper_Pin_State;
-
    function Get_Stepper_Pin_State (Stepper : Stepper_Name; Pin : Stepper_Input_Pins) return Pin_State is
    begin
       return Low_State;
@@ -136,7 +131,6 @@ procedure Prunt_Simulator is
       Get_Time                    => Get_Time,
       Stepper_Name                => Stepper_Name,
       Set_Stepper_Pin_State       => Set_Stepper_Pin_State,
-      Toggle_Stepper_Pin_State    => Toggle_Stepper_Pin_State,
       Get_Stepper_Pin_State       => Get_Stepper_Pin_State,
       Heater_Name                 => Heater_Name,
       Set_Heater_PWM              => Set_Heater_PWM,
