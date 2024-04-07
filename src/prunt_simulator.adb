@@ -29,10 +29,10 @@ procedure Prunt_Simulator is
    subtype Stepper_Name is Axis_Name;
 
    Stepper_Models : array (Stepper_Name) of Basic_Stepper_Model.Stepper_Type :=
-     [E_Axis => (Pos => 0.0 * mm, Mm_Per_Step => 0.000001 * mm, others => <>),
-     X_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.000001 * mm, others => <>),
-     Y_Axis  => (Pos => 0.1 * mm, Mm_Per_Step => 0.000001 * mm, others => <>),
-     Z_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.000001 * mm, others => <>)];
+     [E_Axis => (Pos => 0.0 * mm, Mm_Per_Step => 0.000_001 * mm, others => <>),
+     X_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.000_001 * mm, others => <>),
+     Y_Axis  => (Pos => 0.1 * mm, Mm_Per_Step => 0.000_001 * mm, others => <>),
+     Z_Axis  => (Pos => 50.0 * mm, Mm_Per_Step => 0.000_001 * mm, others => <>)];
 
    type Low_Level_Time_Type is mod 2**64;
 
@@ -48,11 +48,15 @@ procedure Prunt_Simulator is
       return Dimensioned_Float (T) / Dimensioned_Float (Ticks_Per_Second) * s;
    end Low_Level_To_Time;
 
-   Last_Time : Low_Level_Time_Type := 0 with
+   Last_Time        : Low_Level_Time_Type := 0 with
+     Volatile;
+   Last_Update_Time : Low_Level_Time_Type := 0 with
      Volatile;
 
    function Get_Time return Low_Level_Time_Type is
    begin
+      --  TODO: Add locking here when more things start calling Get_Time.
+
       if Last_Time mod 270_000 = 0 then
          Put_Line
            (Low_Level_To_Time (Last_Time)'Image & "," & Stepper_Models (X_Axis).Pos'Image & "," &
@@ -60,13 +64,24 @@ procedure Prunt_Simulator is
             Stepper_Models (E_Axis).Pos'Image);
       end if;
 
+      Last_Time := @ + 1;
+
       for I in Heater_Name loop
-         Basic_Thermal_Model.Update (Heater_Models (I), Low_Level_To_Time (1));
+         Basic_Thermal_Model.Update (Heater_Models (I), Low_Level_To_Time (Last_Time - Last_Update_Time));
       end loop;
 
-      Last_Time := @ + 1;
+      Last_Update_Time := Last_Time;
+
       return Last_Time;
    end Get_Time;
+
+   procedure Waiting_For_Time (T : Low_Level_Time_Type) is
+      Next_Mod : constant Low_Level_Time_Type := (Last_Time + 269_999) / 270_000 * 270_000;
+   begin
+      if T > Last_Time then
+         Last_Time := Low_Level_Time_Type'Min (T - 1, Next_Mod);
+      end if;
+   end Waiting_For_Time;
 
    procedure Set_Stepper_Pin_State (Stepper : Stepper_Name; Pin : Stepper_Output_Pins; State : Pin_State) is
    begin
@@ -145,7 +160,9 @@ procedure Prunt_Simulator is
       Stepgen_Preprocessor_CPU    => 3,
       Stepgen_Pulse_Generator_CPU => 4,
       Config_Path                 => "./prunt_sim.toml",
-      Interpolation_Time          => Time_To_Low_Level (0.0005 * s));
+      Interpolation_Time          => Time_To_Low_Level (0.000_5 * s),
+      Waiting_For_Time            => Waiting_For_Time,
+      Ignore_Empty_Queue          => True);
 
 begin
    My_Glue.Run;

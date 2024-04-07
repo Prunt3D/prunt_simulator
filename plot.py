@@ -76,4 +76,4 @@ def plot_kinematics(x, y):
 
     plt.show()
 
-plot_kinematics(x_values[27600:], y_values[27600:])
+plot_kinematics(x_values[:], y_values[:])
