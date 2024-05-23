@@ -7,11 +7,9 @@ maintainers = ["Liam Powell <liam@liampll.com>"]
 maintainers-logins = ["liampwll"]
 executables = ["prunt_simulator"]
 [[depends-on]]
-prunt_physical_types = "*"
-prunt_glue = "*"
+prunt = "*"
 [[pins]]
-prunt_physical_types = { path = "../prunt_physical_types" }
-prunt_glue = { path = "../prunt_glue" }
+prunt = { path = "../prunt" }
 
 [build-switches]
 release.optimization = []

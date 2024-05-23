@@ -19,8 +19,7 @@
 --                                                                         --
 -----------------------------------------------------------------------------
 
-with Physical_Types; use Physical_Types;
-with Prunt_Glue;     use Prunt_Glue;
+with Prunt; use Prunt;
 
 package Basic_Stepper_Model is
 

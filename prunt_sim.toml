@@ -21,6 +21,7 @@ Kind = "DISABLED_KIND"
 Thermistor = "HOTEND"
 [Homing]
 [Homing.E_AXIS]
+Back_Off_Move_Distance = 0.00000000000000E+00
 First_Move_Distance = 0.00000000000000E+00
 Kind = "SET_TO_VALUE_KIND"
 Second_Move_Distance = 0.00000000000000E+00
@@ -28,18 +29,21 @@ Switch = "X_AXIS"
 Switch_Position = 0.00000000000000E+00
 Value = 0.00000000000000E+00
 [Homing.X_AXIS]
+Back_Off_Move_Distance = 3.00000000000000E+00
 First_Move_Distance = -1.00000000000000E+00
 Kind = "DOUBLE_TAP_KIND"
 Second_Move_Distance = -3.00000000000000E-01
 Switch = "X_AXIS"
 Switch_Position = 0.00000000000000E+00
 [Homing.Y_AXIS]
+Back_Off_Move_Distance = 3.00000000000000E+00
 First_Move_Distance = -1.00000000000000E+00
 Kind = "DOUBLE_TAP_KIND"
 Second_Move_Distance = -3.00000000000000E-01
 Switch = "Y_AXIS"
 Switch_Position = 0.00000000000000E+00
 [Homing.Z_AXIS]
+Back_Off_Move_Distance = -3.00000000000000E+00
 First_Move_Distance = 1.00000000000000E+00
 Kind = "DOUBLE_TAP_KIND"
 Second_Move_Distance = 3.00000000000000E-01
@@ -86,11 +90,41 @@ X_AXIS = 1.00000000000000E+02
 Y_AXIS = 1.00000000000000E+02
 Z_AXIS = 1.00000000000000E+02
 [Kinematics.Max_Limits]
-Acceleration_Max = 1.00000000000000E+03
+Acceleration_Max = 2.00000000000000E+03
+Chord_Error_Max = 1.00000000000000E+00
+Crackle_Max = 1.00000000000000E+50
+Jerk_Max = 1.00000000000000E+50
+Snap_Max = 1.00000000000000E+50
+[Kinematics.Planner_Parameters]
+Acceleration_Max = 5.00000000000000E+03
 Chord_Error_Max = 1.00000000000000E-01
 Crackle_Max = 1.00000000000000E+09
+Ignore_E_In_XYZE = true
 Jerk_Max = 1.00000000000000E+05
+Pressure_Advance_Time = 3.00000000000000E-01
+Shift_Blended_Corners = true
 Snap_Max = 1.00000000000000E+07
+Tangential_Velocity_Max = 1.00000000000000E+02
+[Kinematics.Planner_Parameters.Axial_Velocity_Maxes]
+E_AXIS = 1.00000000000000E+01
+X_AXIS = 1.00000000000000E+02
+Y_AXIS = 1.00000000000000E+02
+Z_AXIS = 1.00000000000000E+02
+[Kinematics.Planner_Parameters.Higher_Order_Scaler]
+E_AXIS = 3.00000000000000E+00
+X_AXIS = 5.00000000000000E-01
+Y_AXIS = 1.00000000000000E+00
+Z_AXIS = 1.00000000000000E+00
+[Kinematics.Planner_Parameters.Lower_Pos_Limit]
+E_AXIS = -8.98846567431158E+307
+X_AXIS = 0.00000000000000E+00
+Y_AXIS = 0.00000000000000E+00
+Z_AXIS = 0.00000000000000E+00
+[Kinematics.Planner_Parameters.Upper_Pos_Limit]
+E_AXIS = 8.98846567431158E+307
+X_AXIS = 1.00000000000000E+03
+Y_AXIS = 1.00000000000000E+03
+Z_AXIS = 1.00000000000000E+02
 [Kinematics.Planning_Scaler]
 E_AXIS = 1.00000000000000E+00
 X_AXIS = 1.00000000000000E+00
@@ -98,8 +132,8 @@ Y_AXIS = 1.00000000000000E+00
 Z_AXIS = 1.00000000000000E+00
 [Kinematics.Upper_Pos_Limit]
 E_AXIS = 8.98846567431158E+307
-X_AXIS = 1.00000000000000E+02
-Y_AXIS = 1.00000000000000E+02
+X_AXIS = 1.00000000000000E+03
+Y_AXIS = 1.00000000000000E+03
 Z_AXIS = 1.00000000000000E+02
 [Prunt]
 Enabled = true
@@ -110,7 +144,7 @@ Enabled = true
 Enabled_On_High = false
 Fault_On_High = false
 Invert_Direction = false
-Mm_Per_Step = 1.00000000000000E-06
+Mm_Per_Step = 1.00000000000000E+00
 Step_Time = 0.00000000000000E+00
 [Stepper.X_AXIS]
 Direction_Setup_Time = 0.00000000000000E+00
@@ -118,7 +152,7 @@ Enabled = true
 Enabled_On_High = false
 Fault_On_High = false
 Invert_Direction = false
-Mm_Per_Step = 1.00000000000000E-06
+Mm_Per_Step = 1.00000000000000E+00
 Step_Time = 0.00000000000000E+00
 [Stepper.Y_AXIS]
 Direction_Setup_Time = 0.00000000000000E+00
@@ -126,7 +160,7 @@ Enabled = true
 Enabled_On_High = false
 Fault_On_High = false
 Invert_Direction = false
-Mm_Per_Step = 1.00000000000000E-06
+Mm_Per_Step = 1.00000000000000E+00
 Step_Time = 0.00000000000000E+00
 [Stepper.Z_AXIS]
 Direction_Setup_Time = 0.00000000000000E+00
@@ -134,7 +168,7 @@ Enabled = true
 Enabled_On_High = false
 Fault_On_High = false
 Invert_Direction = false
-Mm_Per_Step = 1.00000000000000E-06
+Mm_Per_Step = 1.00000000000000E+00
 Step_Time = 0.00000000000000E+00
 [Thermistor]
 [Thermistor.BED]

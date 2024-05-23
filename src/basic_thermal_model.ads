@@ -19,7 +19,7 @@
 --                                                                         --
 -----------------------------------------------------------------------------
 
-with Physical_Types; use Physical_Types;
+with Prunt; use Prunt;
 
 package Basic_Thermal_Model is
 
