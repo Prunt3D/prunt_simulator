@@ -12,4 +12,5 @@ prunt = "*"
 prunt = { path = "../prunt" }
 
 [build-switches]
-release.optimization = []
+release.optimization = ["-O3", "-gnatn", "-fdata-sections", "-ffunction-sections", "-flto=auto", "-fuse-linker-plugin", "-ffat-lto-objects"]
+development.contracts = "Yes"
