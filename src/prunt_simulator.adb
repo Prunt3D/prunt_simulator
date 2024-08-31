@@ -19,13 +19,14 @@
 --                                                                         --
 -----------------------------------------------------------------------------
 
-with Prunt;       use Prunt;
+with Prunt;                   use Prunt;
 with Prunt.Controller;
 with System.Multiprocessors;
-with Basic_Thermal_Model;
-with Basic_Stepper_Model;
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;             use Ada.Text_IO;
 with Prunt.Controller_Generic_Types;
+with Prunt.TMC_Types.TMC2240; use Prunt.TMC_Types.TMC2240;
+with Prunt.TMC_Types;         use Prunt.TMC_Types;
+with Prunt.Heaters;
 
 procedure Prunt_Simulator is
 
@@ -44,13 +45,16 @@ procedure Prunt_Simulator is
 
    use My_Controller_Generic_Types;
 
+   procedure Setup
+     (Heater_Thermistors : Heater_Thermistor_Map; Thermistors : Thermistor_Parameters_Array_Type) is null;
+   procedure Reconfigure_Heater (Heater : Heater_Name; Params : Prunt.Heaters.Heater_Parameters) is null;
+   procedure Autotune_Heater (Heater : Heater_Name; Params : Prunt.Heaters.Heater_Parameters) is null;
    procedure Enable_Stepper (Stepper : Stepper_Name) is null;
    procedure Disable_Stepper (Stepper : Stepper_Name) is null;
    procedure Setup_For_Loop_Move (Switch : Stepper_Name; Hit_State : Pin_State) is null;
    procedure Setup_For_Conditional_Move (Switch : Stepper_Name; Hit_State : Pin_State) is null;
    procedure Reset_Position (Pos : Stepper_Position) is null;
    procedure Wait_Until_Idle (Last_Command : Command_Index) is null;
-   procedure Wait_Until_Heater_Stable (Last_Command : Command_Index; Heater : Heater_Name) is null;
 
    procedure Enqueue_Command (Command : Queued_Command) is
    begin
@@ -66,15 +70,16 @@ procedure Prunt_Simulator is
            (Kind => Basic_Kind, Enable_Stepper => Enable_Stepper'Access, Disable_Stepper => Disable_Stepper'Access)),
       Interpolation_Time         => 0.000_1 * s,
       Loop_Interpolation_Time    => 0.000_1 * s,
+      Setup                      => Setup,
+      Reconfigure_Heater         => Reconfigure_Heater,
+      Autotune_Heater            => Autotune_Heater,
       Setup_For_Loop_Move        => Setup_For_Loop_Move,
       Setup_For_Conditional_Move => Setup_For_Conditional_Move,
       Enqueue_Command            => Enqueue_Command,
       Reset_Position             => Reset_Position,
       Wait_Until_Idle            => Wait_Until_Idle,
-      Wait_Until_Heater_Stable   => Wait_Until_Heater_Stable,
       Config_Path                => "./prunt_sim.toml",
       Command_Generator_CPU      => System.Multiprocessors.Not_A_Specific_CPU);
-
 begin
    My_Controller.Run;
 end Prunt_Simulator;
