@@ -78,8 +78,7 @@ procedure Prunt_Simulator is
       Enqueue_Command            => Enqueue_Command,
       Reset_Position             => Reset_Position,
       Wait_Until_Idle            => Wait_Until_Idle,
-      Config_Path                => "./prunt_sim.toml",
-      Command_Generator_CPU      => System.Multiprocessors.Not_A_Specific_CPU);
+      Config_Path                => "./prunt_sim.toml");
 begin
    My_Controller.Run;
 end Prunt_Simulator;
