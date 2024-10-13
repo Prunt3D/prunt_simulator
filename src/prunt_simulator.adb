@@ -36,12 +36,15 @@ procedure Prunt_Simulator is
 
    type Fan_Name is (Fan_1, Fan_2);
 
+   type Board_Temperature_Probe_Name is range 1..0;
+
    package My_Controller_Generic_Types is new Prunt.Controller_Generic_Types
-     (Stepper_Name      => Stepper_Name,
-      Heater_Name       => Heater_Name,
-      Thermistor_Name   => Heater_Name,
-      Fan_Name          => Fan_Name,
-      Input_Switch_Name => Stepper_Name);
+     (Stepper_Name                 => Stepper_Name,
+      Heater_Name                  => Heater_Name,
+      Thermistor_Name              => Heater_Name,
+      Board_Temperature_Probe_Name => Board_Temperature_Probe_Name,
+      Fan_Name                     => Fan_Name,
+      Input_Switch_Name            => Stepper_Name);
 
    use My_Controller_Generic_Types;
 
