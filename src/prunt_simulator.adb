@@ -51,6 +51,7 @@ procedure Prunt_Simulator is
    procedure Setup
      (Heater_Thermistors : Heater_Thermistor_Map; Thermistors : Thermistor_Parameters_Array_Type) is null;
    procedure Reconfigure_Heater (Heater : Heater_Name; Params : Prunt.Heaters.Heater_Parameters) is null;
+   procedure Reconfigure_Fan (Fan : Fan_Name; PWM_Freq : Fan_PWM_Frequency) is null;
    procedure Autotune_Heater (Heater : Heater_Name; Params : Prunt.Heaters.Heater_Parameters) is null;
    procedure Enable_Stepper (Stepper : Stepper_Name) is null;
    procedure Disable_Stepper (Stepper : Stepper_Name) is null;
@@ -75,6 +76,7 @@ procedure Prunt_Simulator is
       Loop_Interpolation_Time    => 0.000_1 * s,
       Setup                      => Setup,
       Reconfigure_Heater         => Reconfigure_Heater,
+      Reconfigure_Fan            => Reconfigure_Fan,
       Autotune_Heater            => Autotune_Heater,
       Setup_For_Loop_Move        => Setup_For_Loop_Move,
       Setup_For_Conditional_Move => Setup_For_Conditional_Move,
