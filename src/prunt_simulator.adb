@@ -59,6 +59,7 @@ procedure Prunt_Simulator is
    procedure Setup_For_Conditional_Move (Switch : Stepper_Name; Hit_State : Pin_State) is null;
    procedure Reset_Position (Pos : Stepper_Position) is null;
    procedure Wait_Until_Idle (Last_Command : Command_Index) is null;
+   procedure Shutdown is null;
 
    procedure Enqueue_Command (Command : Queued_Command) is
    begin
@@ -83,6 +84,7 @@ procedure Prunt_Simulator is
       Enqueue_Command            => Enqueue_Command,
       Reset_Position             => Reset_Position,
       Wait_Until_Idle            => Wait_Until_Idle,
+      Shutdown                   => Shutdown,
       Config_Path                => "./prunt_sim.toml");
 begin
    My_Controller.Run;
