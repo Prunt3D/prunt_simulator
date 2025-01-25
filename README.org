@@ -1,0 +1,4 @@
+* Running with plotted output
+#+begin_src shell
+stdbuf -oL -eL ./bin/prunt_simulator | stdbuf -oL -eL awk '/DATA OUTPUT,/ {print > "/dev/stdout"} !/DATA OUTPUT,/ {print > "/dev/stderr"}' | stdbuf -oL -eL python3 ./continuous_plot.py
+#+end_src

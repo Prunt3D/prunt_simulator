@@ -30,13 +30,15 @@ with Prunt.Heaters;
 
 procedure Prunt_Simulator is
 
+   package Dimensionless_Text_IO is new Ada.Text_IO.Float_IO (Dimensionless);
+
    type Stepper_Name is new Axis_Name;
 
    type Heater_Name is (Hotend, Bed);
 
    type Fan_Name is (Fan_1, Fan_2);
 
-   type Board_Temperature_Probe_Name is range 1..0;
+   type Board_Temperature_Probe_Name is range 1 .. 0;
 
    package My_Controller_Generic_Types is new Prunt.Controller_Generic_Types
      (Stepper_Name                 => Stepper_Name,
@@ -63,9 +65,30 @@ procedure Prunt_Simulator is
 
    procedure Enqueue_Command (Command : Queued_Command) is
    begin
-      Put_Line
-        ("," & Command.Pos (X_Axis)'Image & "," & Command.Pos (Y_Axis)'Image & "," & Command.Pos (Z_Axis)'Image & "," &
-         Command.Pos (E_Axis)'Image & ",,,,,");
+      Put ("DATA OUTPUT,");
+      Dimensionless_Text_IO.Put (Command.Pos (X_Axis) / mm, Aft => 20, Exp => 1);
+      Put (",");
+      Dimensionless_Text_IO.Put (Command.Pos (Y_Axis) / mm, Aft => 20, Exp => 1);
+      Put (",");
+      Dimensionless_Text_IO.Put (Command.Pos (Z_Axis) / mm, Aft => 20, Exp => 1);
+      Put (",");
+      Dimensionless_Text_IO.Put (Command.Pos (E_Axis) / mm, Aft => 20, Exp => 1);
+      Put_Line ("");
+
+      if Command.Safe_Stop_After then
+         --  Send the command many times so the plotter can show it properly.
+         for I in 0 .. 5 loop
+            Put ("DATA OUTPUT,");
+            Dimensionless_Text_IO.Put (Command.Pos (X_Axis) / mm, Aft => 20, Exp => 1);
+            Put (",");
+            Dimensionless_Text_IO.Put (Command.Pos (Y_Axis) / mm, Aft => 20, Exp => 1);
+            Put (",");
+            Dimensionless_Text_IO.Put (Command.Pos (Z_Axis) / mm, Aft => 20, Exp => 1);
+            Put (",");
+            Dimensionless_Text_IO.Put (Command.Pos (E_Axis) / mm, Aft => 20, Exp => 1);
+            Put_Line ("");
+         end loop;
+      end if;
    end Enqueue_Command;
 
    package My_Controller is new Prunt.Controller
@@ -85,7 +108,7 @@ procedure Prunt_Simulator is
       Reset_Position             => Reset_Position,
       Wait_Until_Idle            => Wait_Until_Idle,
       Shutdown                   => Shutdown,
-      Config_Path                => "./prunt_sim.toml");
+      Config_Path                => "./prunt_sim.json");
 begin
    My_Controller.Run;
 end Prunt_Simulator;
