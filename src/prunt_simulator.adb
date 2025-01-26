@@ -62,6 +62,26 @@ procedure Prunt_Simulator is
    procedure Reset_Position (Pos : Stepper_Position) is null;
    procedure Wait_Until_Idle (Last_Command : Command_Index) is null;
    procedure Shutdown is null;
+   procedure Enqueue_Command (Command : Queued_Command);
+
+   package My_Controller is new Prunt.Controller
+     (Generic_Types              => My_Controller_Generic_Types,
+      Stepper_Hardware           =>
+        (others =>
+           (Kind => Basic_Kind, Enable_Stepper => Enable_Stepper'Access, Disable_Stepper => Disable_Stepper'Access)),
+      Interpolation_Time         => 0.000_1 * s,
+      Loop_Interpolation_Time    => 0.000_1 * s,
+      Setup                      => Setup,
+      Reconfigure_Heater         => Reconfigure_Heater,
+      Reconfigure_Fan            => Reconfigure_Fan,
+      Autotune_Heater            => Autotune_Heater,
+      Setup_For_Loop_Move        => Setup_For_Loop_Move,
+      Setup_For_Conditional_Move => Setup_For_Conditional_Move,
+      Enqueue_Command            => Enqueue_Command,
+      Reset_Position             => Reset_Position,
+      Wait_Until_Idle            => Wait_Until_Idle,
+      Shutdown                   => Shutdown,
+      Config_Path                => "./prunt_sim.json");
 
    procedure Enqueue_Command (Command : Queued_Command) is
    begin
@@ -89,26 +109,9 @@ procedure Prunt_Simulator is
             Put_Line ("");
          end loop;
       end if;
-   end Enqueue_Command;
 
-   package My_Controller is new Prunt.Controller
-     (Generic_Types              => My_Controller_Generic_Types,
-      Stepper_Hardware           =>
-        (others =>
-           (Kind => Basic_Kind, Enable_Stepper => Enable_Stepper'Access, Disable_Stepper => Disable_Stepper'Access)),
-      Interpolation_Time         => 0.000_1 * s,
-      Loop_Interpolation_Time    => 0.000_1 * s,
-      Setup                      => Setup,
-      Reconfigure_Heater         => Reconfigure_Heater,
-      Reconfigure_Fan            => Reconfigure_Fan,
-      Autotune_Heater            => Autotune_Heater,
-      Setup_For_Loop_Move        => Setup_For_Loop_Move,
-      Setup_For_Conditional_Move => Setup_For_Conditional_Move,
-      Enqueue_Command            => Enqueue_Command,
-      Reset_Position             => Reset_Position,
-      Wait_Until_Idle            => Wait_Until_Idle,
-      Shutdown                   => Shutdown,
-      Config_Path                => "./prunt_sim.json");
+      My_Controller.Report_Last_Command_Executed (Command.Index);
+   end Enqueue_Command;
 begin
    My_Controller.Run;
 end Prunt_Simulator;
