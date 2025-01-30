@@ -29,12 +29,12 @@ def update_plot(_, q):
         positions, derivatives = q.get()
 
         axes[0].clear()
-        axes[0].plot(positions[0][5:-5], positions[1][5:-5], "b-")
+        axes[0].plot(positions[0], positions[1], "b-")
 
         for i in range(0, len(derivatives)):
             axes[i + 1].clear()
             for j in range(0, len(derivatives[i])):
-                axes[i + 1].plot(derivatives[i][j][5:-5], ["r", "g", "b", "m", "y"][j] + "-")
+                axes[i + 1].plot(derivatives[i][j], ["r", "g", "b", "m", "y"][j] + "-")
 
         axes[0].set_aspect(1)
         axes[0].set_title("2D Points")
@@ -61,27 +61,27 @@ def input_loop(q):
         for i in range(0, len(new_pos)):
             positions[i].append(new_pos[i])
             if len(positions[i]) > 10000:
-                del positions[i][:100]
+                del positions[i][:1000]
             velocities[i].append((positions[i][-1] - positions[i][-2]) / step_time)
             velocity_square_sum += velocities[i][-1]**2
         velocities[-1].append(sqrt(velocity_square_sum))
 
         for i in range(0, len(velocities)):
             if len(velocities[i]) > 10000:
-                del velocities[i][:100]
+                del velocities[i][:1000]
 
-        if step == 100 or velocities[-1][-1] == 0.0:
+        if step == 1000 or velocities[-1][-1] == 0.0:
             step = 0
 
             derivatives = [[np.array(x) for x in velocities]]
 
-            for _ in range(4):
-                derivatives.append([np.gradient(derivatives[-1][i], step_time) for i in range(0, len(derivatives[-1]))])
+            for j in range(1, 5):
+                derivatives.append([np.diff(derivatives[0][i], n=j) / step_time**j for i in range(0, len(derivatives[-1]))])
 
             q.put((deepcopy(positions), derivatives))
 
 input_thread = threading.Thread(target=input_loop, args=(animation_queue,), daemon=True)
 input_thread.start()
 
-plot_animation = FuncAnimation(fig, update_plot, interval=100, fargs=(animation_queue,), cache_frame_data=False)
+plot_animation = FuncAnimation(fig, update_plot, interval=1000, fargs=(animation_queue,), cache_frame_data=False)
 plt.show()
