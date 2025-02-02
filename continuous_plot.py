@@ -81,7 +81,11 @@ def update_plot(_, q):
     derivative_axes[3].set_title("Snap")
     derivative_axes[4].set_title("Crackle")
 
+flush_needed = False
+
 def input_loop(q):
+    global flush_needed
+
     step_time = 0.0001
 
     step = 0
@@ -104,7 +108,12 @@ def input_loop(q):
             velocity_square_sum += velocities[i][-1]**2
         velocities[-1].append(sqrt(velocity_square_sum))
 
-        if step >= input_step_size or velocities[-1][-1] == 0.0:
+        if velocities[-1][-1] != 0.0:
+            flush_needed = True
+
+        if step >= input_step_size or (velocities[-1][-1] == 0.0 and flush_needed):
+            flush_needed = False
+
             step = 0
 
             if len(positions[i]) > max_plot_length:
