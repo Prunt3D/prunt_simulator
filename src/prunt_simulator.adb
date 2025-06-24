@@ -26,7 +26,6 @@ with Ada.Text_IO;             use Ada.Text_IO;
 with Prunt.Controller_Generic_Types;
 with Prunt.TMC_Types.TMC2240; use Prunt.TMC_Types.TMC2240;
 with Prunt.TMC_Types;         use Prunt.TMC_Types;
-with Prunt.Heaters;
 
 procedure Prunt_Simulator is
 
@@ -40,72 +39,143 @@ procedure Prunt_Simulator is
 
    type Board_Temperature_Probe_Name is range 1 .. 0;
 
-   package My_Controller_Generic_Types is new Prunt.Controller_Generic_Types
-     (Stepper_Name                 => Stepper_Name,
-      Heater_Name                  => Heater_Name,
-      Thermistor_Name              => Heater_Name,
-      Board_Temperature_Probe_Name => Board_Temperature_Probe_Name,
-      Fan_Name                     => Fan_Name,
-      Input_Switch_Name            => Stepper_Name);
+   package My_Controller_Generic_Types is new
+     Prunt.Controller_Generic_Types
+       (Stepper_Name                 => Stepper_Name,
+        Heater_Name                  => Heater_Name,
+        Thermistor_Name              => Heater_Name,
+        Board_Temperature_Probe_Name => Board_Temperature_Probe_Name,
+        Fan_Name                     => Fan_Name,
+        Input_Switch_Name            => Stepper_Name);
 
    use My_Controller_Generic_Types;
 
-   procedure Setup
-     (Heater_Thermistors : Heater_Thermistor_Map; Thermistors : Thermistor_Parameters_Array_Type) is null;
-   procedure Reconfigure_Heater (Heater : Heater_Name; Params : Prunt.Heaters.Heater_Parameters) is null;
+   procedure Setup (Heater_Thermistors : Heater_Thermistor_Map; Thermistors : Thermistor_Parameters_Array_Type)
+   is null;
+   procedure Reconfigure_Heater (Heater : Heater_Name; Params : Heater_Parameters) is null;
    procedure Reconfigure_Fan (Fan : Fan_Name; PWM_Freq : Fan_PWM_Frequency) is null;
-   procedure Autotune_Heater (Heater : Heater_Name; Params : Prunt.Heaters.Heater_Parameters) is null;
+   procedure Autotune_Heater (Heater : Heater_Name; Params : Heater_Parameters) is null;
    procedure Enable_Stepper (Stepper : Stepper_Name) is null;
    procedure Disable_Stepper (Stepper : Stepper_Name) is null;
-   procedure Setup_For_Loop_Move (Switch : Stepper_Name; Hit_State : Pin_State) is null;
-   procedure Setup_For_Conditional_Move (Switch : Stepper_Name; Hit_State : Pin_State) is null;
-   procedure Reset_Position (Pos : Stepper_Position) is null;
+   procedure Setup_For_Loop_Move (Switch : Stepper_Name; Hit_State : Pin_State);
+   procedure Setup_For_Conditional_Move (Switch : Stepper_Name; Hit_State : Pin_State);
+   procedure Reset_Position (Pos : Stepper_Position);
    procedure Wait_Until_Idle (Last_Command : Command_Index) is null;
-   procedure Shutdown is null;
+   procedure Reset is null;
    procedure Enqueue_Command (Command : Queued_Command);
 
-   package My_Controller is new Prunt.Controller
-     (Generic_Types              => My_Controller_Generic_Types,
-      Stepper_Hardware           =>
-        (others =>
-           (Kind => Basic_Kind, Enable_Stepper => Enable_Stepper'Access, Disable_Stepper => Disable_Stepper'Access)),
-      Interpolation_Time         => 0.000_1 * s,
-      Loop_Interpolation_Time    => 0.000_1 * s,
-      Setup                      => Setup,
-      Reconfigure_Heater         => Reconfigure_Heater,
-      Reconfigure_Fan            => Reconfigure_Fan,
-      Autotune_Heater            => Autotune_Heater,
-      Setup_For_Loop_Move        => Setup_For_Loop_Move,
-      Setup_For_Conditional_Move => Setup_For_Conditional_Move,
-      Enqueue_Command            => Enqueue_Command,
-      Reset_Position             => Reset_Position,
-      Wait_Until_Idle            => Wait_Until_Idle,
-      Shutdown                   => Shutdown,
-      Config_Path                => "./prunt_sim.json");
+   Max_Fan_Frequency : constant Frequency := 50_000.0 * hertz;
+
+   package My_Controller is new
+     Prunt.Controller
+       (Generic_Types              => My_Controller_Generic_Types,
+        Stepper_Hardware           =>
+          (others =>
+             (Kind => Basic_Kind, Enable_Stepper => Enable_Stepper'Access, Disable_Stepper => Disable_Stepper'Access)),
+        Fan_Hardware               =>
+          (others =>
+             (Kind                            => Fixed_Switching_Kind,
+              Reconfigure_Fixed_Switching_Fan => Reconfigure_Fan'Access,
+              Maximum_PWM_Frequency           => Max_Fan_Frequency)),
+        Interpolation_Time         => 0.000_1 * s,
+        Loop_Interpolation_Time    => 0.000_1 * s,
+        Setup                      => Setup,
+        Reconfigure_Heater         => Reconfigure_Heater,
+        Autotune_Heater            => Autotune_Heater,
+        Setup_For_Loop_Move        => Setup_For_Loop_Move,
+        Setup_For_Conditional_Move => Setup_For_Conditional_Move,
+        Enqueue_Command            => Enqueue_Command,
+        Reset_Position             => Reset_Position,
+        Wait_Until_Idle            => Wait_Until_Idle,
+        Reset                      => Reset,
+        Config_Path                => "./prunt_sim.json");
+
+   Loop_Switch              : Stepper_Name;
+   Loop_Switch_Target_State : Pin_State;
+
+   In_Conditional_Mode : Boolean := False;
+
+   Current_Pos : Stepper_Position := (others => 0.0);
+   Offset_Pos  : Stepper_Position := (others => 0.0);
+
+   function "+" (Left, Right : Stepper_Position) return Stepper_Position is
+   begin
+      return (for S in Stepper_Name => Left (S) + Right (S));
+   end "+";
+
+   function "-" (Left, Right : Stepper_Position) return Stepper_Position is
+   begin
+      return (for S in Stepper_Name => Left (S) - Right (S));
+   end "-";
+
+   procedure Reset_Position (Pos : Stepper_Position) is
+   begin
+      Offset_Pos := Offset_Pos + Pos - Current_Pos;
+      Current_Pos := Pos;
+   end Reset_Position;
+
+   procedure Setup_For_Loop_Move (Switch : Stepper_Name; Hit_State : Pin_State) is
+   begin
+      Loop_Switch := Switch;
+      Loop_Switch_Target_State := Hit_State;
+   end Setup_For_Loop_Move;
+
+   procedure Setup_For_Conditional_Move (Switch : Stepper_Name; Hit_State : Pin_State) is
+   begin
+      if Hit_State = High_State then
+         In_Conditional_Mode := Current_Pos (Switch) - Offset_Pos (Switch) < 0.0;
+      else
+         In_Conditional_Mode := Current_Pos (Switch) - Offset_Pos (Switch) >= 0.0;
+      end if;
+   end Setup_For_Conditional_Move;
 
    procedure Enqueue_Command (Command : Queued_Command) is
    begin
-      Put ("DATA OUTPUT,");
-      Dimensionless_Text_IO.Put (Command.Pos (X_Axis) / mm, Aft => 20, Exp => 1);
-      Put (",");
-      Dimensionless_Text_IO.Put (Command.Pos (Y_Axis) / mm, Aft => 20, Exp => 1);
-      Put (",");
-      Dimensionless_Text_IO.Put (Command.Pos (Z_Axis) / mm, Aft => 20, Exp => 1);
-      Put (",");
-      Dimensionless_Text_IO.Put (Command.Pos (E_Axis) / mm, Aft => 20, Exp => 1);
-      Put_Line ("");
+      if not In_Conditional_Mode then
+         declare
+            Offset : Stepper_Position := Current_Pos - Command.Pos;
+         begin
+            Current_Pos := Command.Pos;
+
+            loop
+               Put ("DATA OUTPUT,");
+               Dimensionless_Text_IO.Put (Current_Pos (X_Axis) - Offset_Pos (X_Axis), Aft => 20, Exp => 1);
+               Put (",");
+               Dimensionless_Text_IO.Put (Current_Pos (Y_Axis) - Offset_Pos (Y_Axis), Aft => 20, Exp => 1);
+               Put (",");
+               Dimensionless_Text_IO.Put (Current_Pos (Z_Axis) - Offset_Pos (Z_Axis), Aft => 20, Exp => 1);
+               Put (",");
+               Dimensionless_Text_IO.Put (Current_Pos (E_Axis) - Offset_Pos (E_Axis), Aft => 20, Exp => 1);
+               Put_Line ("");
+
+               if Command.Loop_Until_Hit then
+                  if Loop_Switch_Target_State = High_State then
+                     exit when Current_Pos (Loop_Switch) - Offset_Pos (Loop_Switch) < 0.0;
+                  else
+                     exit when Current_Pos (Loop_Switch) - Offset_Pos (Loop_Switch) >= 0.0;
+                  end if;
+
+                  Offset_Pos := Offset_Pos + Offset;
+               else
+                  exit;
+               end if;
+            end loop;
+         end;
+      end if;
 
       if Command.Safe_Stop_After then
+         In_Conditional_Mode := False;
+
          --  Send the command many times so the plotter can show it properly.
          for I in 0 .. 5 loop
             Put ("DATA OUTPUT,");
-            Dimensionless_Text_IO.Put (Command.Pos (X_Axis) / mm, Aft => 20, Exp => 1);
+            Dimensionless_Text_IO.Put (Current_Pos (X_Axis) - Offset_Pos (X_Axis), Aft => 20, Exp => 1);
             Put (",");
-            Dimensionless_Text_IO.Put (Command.Pos (Y_Axis) / mm, Aft => 20, Exp => 1);
+            Dimensionless_Text_IO.Put (Current_Pos (Y_Axis) - Offset_Pos (Y_Axis), Aft => 20, Exp => 1);
             Put (",");
-            Dimensionless_Text_IO.Put (Command.Pos (Z_Axis) / mm, Aft => 20, Exp => 1);
+            Dimensionless_Text_IO.Put (Current_Pos (Z_Axis) - Offset_Pos (Z_Axis), Aft => 20, Exp => 1);
             Put (",");
-            Dimensionless_Text_IO.Put (Command.Pos (E_Axis) / mm, Aft => 20, Exp => 1);
+            Dimensionless_Text_IO.Put (Current_Pos (E_Axis) - Offset_Pos (E_Axis), Aft => 20, Exp => 1);
             Put_Line ("");
          end loop;
       end if;

@@ -29,4 +29,10 @@ project Prunt_Simulator is
          "--no-compact");
    end Pretty_Printer;
 
+   package Format is
+      for Width ("Ada") use "119";
+      for Charset ("Ada") use "utf-8";
+   end Format;
+
+
 end Prunt_Simulator;
